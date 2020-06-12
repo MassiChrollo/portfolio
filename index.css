@@ -151,6 +151,7 @@ scroll-container {
   overflow-y: scroll;
   scroll-behavior: smooth;
   background-color: none;
+  
 }
 scroll-page {
   display: flex;
@@ -158,6 +159,7 @@ scroll-page {
   justify-content: center;
   height: 100%;
   font-size: 1em;
+  margin-left: 185px;
 
 }
 
@@ -175,6 +177,7 @@ nav, scroll-container {
   display: block;
   margin: 0 auto;
   text-align: center;
+  left: -110px;
   
 }
 nav {
@@ -224,9 +227,47 @@ scroll-page {
 
 
 .video_{
-  position: relative;
-
+  position: absolute;
+  top: 45px;
+  height: 290px;
+  
+  width: 250px;
+  left: -50px;
  
+  
+  text-align: left;
+
+}
+.video_2{
+  position: absolute;
+  top: 260px;
+  height: 290px;
+
+  width: 250px;
+  left: -50px;
+ 
+  
+  text-align: left;
+
+}
+.video_3{
+  position: absolute;
+  top: 480px;
+  height: 290px;
+ 
+  width: 250px;
+  left: -50px;
+  
+  text-align: left;
+
+}
+.video_4{
+  position: absolute;
+  top: 860px;
+  height: 290px;
+  
+  width: 250px;
+  left: -50px;
   
   text-align: left;
 
@@ -253,7 +294,7 @@ scroll-page {
   position: relative;
   
   top: 10px;
-  width: 250px;
+  width: 80px;
   height: auto;
   text-align: left;
   border: none;
@@ -292,4 +333,14 @@ margin-top: -100px;
 .desus{
  
   width: 450px;
+}
+
+.top_top{
+  position: absolute;
+  height: 200px;
+top: 11%;
+left: 20%;
+margin-left: -150px;
+margin-top: -100px;
+
 }
