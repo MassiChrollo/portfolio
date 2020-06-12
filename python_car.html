@@ -1,0 +1,773 @@
+<link rel="stylesheet" href="index.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=py&amp;skin="></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hani Massinissa</title>
+</head>
+<body>
+  
+
+
+<div id="wrapper">
+    
+  
+  <nav class="top_top">
+    <h2 class="titre_top">Hani Massinissa - Car NEAT <a  href="#" class="fa fa-github boutoun_github"></a> </h2>
+                    <!--  Les lignes qui suivent varient en fonction de la page dont il est question; les lignes plus haut sont les mêmes pour toutes les pages      -->
+                    <nav>
+                        <a href="#page-1">1</a>
+                        <a href="#page-2">2</a>
+                        <a href="#page-3">3</a>
+                      </nav>
+                      <scroll-container>
+                        <scroll-page id="page-1">
+                            <nav class="video_">
+                                <h1  class="deux_titre">Video du projet </h1>
+                                <video width="250" height="150" controls>
+                                    <source src="jeu_auto_1.webm" type="video/webm">
+                                </video>
+                                <h1 class="deux_titre">Code pour le projet </h1>
+                           
+                                <nav class="info_sousvideo">
+                                    <pre>
+<a href="#page-1">1- Jeu sans IA </a>
+Jeu controlé à la main 0:00
+<a href="#page-2">2- Entrainement de l'IA</a> 
+Fichier de configuration config-feedforward 0:53
+Connexion et valeur des poids de IA 4:38
+<a href="#page-3">3- IA final</a> 
+Implémentation de l'IA entrainé 0:00
+                                    </pre>
+                                </nav>
+                            </nav>
+                            
+                        
+                      
+<pre class="prettyprint">
+import pygame, sys
+from pygame.locals import*
+from math import sin, radians, cos,pi
+pygame.init()
+
+class automobile:
+def __init__(self):
+    self.position_de_lauto_x=100
+    self.position_de_lauto_y=100
+    self.position_initial_de_lauto_x=100
+    self.position_initial_de_lauto_y=100
+    self.angle_de_lauto=180
+    self.vitesse_de_lauto_fois_une_seconde=0
+    self.vitesse_de_freinage=0.01  #pourcentage
+    self.vitesse_maximum=pi/2
+    self.pointage=0
+    self.position_du_dernier_point_x=-3424315143 #valeur non realiste
+    self.position_du_dernier_point_y=-42352345423 #valeur non realiste
+    #Distance par rapport au mur 
+    self.distance_1=1
+    self.distance_2=1
+    self.distance_3=1
+    self.angle_1=0
+    self.angle_2=-315
+    self.angle_3=-45
+
+def run():
+        #couleur 
+        '''Gris = (100, 100, 100)
+        Bleu_Marin = ( 60, 60, 100)
+        Rouge = (255, 0, 0)
+        Jaunne = (255, 255, 0)
+        Orange = (255, 128, 0)
+        Mauve = (255, 0, 255)
+        Cyan = ( 0, 255, 255)
+        Noir=(0,0,0)'''
+        Blanc = (255, 255, 255)
+        Vert = ( 0, 255, 0)
+        Bleu = ( 0, 0, 255)
+
+        #informations utiles
+        hauteur=600
+        largeur=600
+
+        #fenetre 
+        Surface = pygame.display.set_mode((largeur, hauteur), 0, 32)
+        pygame.display.set_caption('Jeu simple - automobile')
+        map_1 = pygame.image.load('map_1.png')
+        Surface.blit(map_1,(0,0))
+
+        #valeur de départ pour les boucles 
+        auto=automobile()
+        couleur_de_la_mort=(236, 10, 87, 255)
+        couleur_point=(50, 115, 161, 255)
+        rester=True
+        while rester:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+            touche_pressee=pygame.key.get_pressed()
+
+            if touche_pressee[pygame.K_DOWN]:
+                auto.vitesse_de_lauto_fois_une_seconde+=1/100
+                
+            if touche_pressee[pygame.K_UP]:
+                auto.vitesse_de_lauto_fois_une_seconde+=-1/100
+
+            if touche_pressee[pygame.K_RIGHT]:
+                auto.angle_de_lauto+=1.5/1 
+        
+            if touche_pressee[pygame.K_LEFT]:
+                auto.angle_de_lauto+=-1.5/1
+
+            if not touche_pressee[pygame.K_LEFT] and not touche_pressee[pygame.K_RIGHT] and not touche_pressee[pygame.K_UP] and not touche_pressee[pygame.K_DOWN]:
+                if auto.vitesse_de_lauto_fois_une_seconde>0:
+                    auto.vitesse_de_lauto_fois_une_seconde+=-auto.vitesse_de_freinage*abs(auto.vitesse_de_lauto_fois_une_seconde)
+
+                elif auto.vitesse_de_lauto_fois_une_seconde < 0:
+                    auto.vitesse_de_lauto_fois_une_seconde+=auto.vitesse_de_freinage*abs(auto.vitesse_de_lauto_fois_une_seconde)
+
+            if abs(auto.vitesse_de_lauto_fois_une_seconde)>auto.vitesse_maximum:
+                auto.vitesse_de_lauto_fois_une_seconde=auto.vitesse_maximum*auto.vitesse_de_lauto_fois_une_seconde/abs(auto.vitesse_de_lauto_fois_une_seconde)
+
+            auto.position_de_lauto_x+=+auto.vitesse_de_lauto_fois_une_seconde*cos(auto.angle_de_lauto*((2*pi)/360))
+            auto.position_de_lauto_y+=+auto.vitesse_de_lauto_fois_une_seconde*sin(auto.angle_de_lauto*((2*pi)/360))                     
+            Surface.blit(map_1,(0,0))
+            pygame.draw.rect(Surface, Vert, (auto.position_de_lauto_x,auto.position_de_lauto_y,5,5))
+
+            #initialise la distance puis determine la distance reel par rapport au mur 
+            auto.distance_1=1
+            auto.distance_2=1
+            auto.distance_3=1
+
+            while Surface.get_at((int(auto.position_de_lauto_x+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_1*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_1*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort and abs(auto.vitesse_de_lauto_fois_une_seconde) > 0 :
+                auto.distance_1+=.5
+            while Surface.get_at((int(auto.position_de_lauto_x+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_2*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_2*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort and abs(auto.vitesse_de_lauto_fois_une_seconde) > 0 :
+                auto.distance_2+=.5					
+            while Surface.get_at((int(auto.position_de_lauto_x+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_3*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_3*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort and abs(auto.vitesse_de_lauto_fois_une_seconde) > 0 :
+                auto.distance_3+=.5
+          
+            #facteur de correction 
+            auto.distance_1-=.5
+            auto.distance_2-=.5
+            auto.distance_3-=.5
+
+            #dessin des lignes
+            pygame.draw.line(Surface,Blanc,(auto.position_de_lauto_x,auto.position_de_lauto_y),((int(auto.position_de_lauto_x+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_1*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_1*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360)))))),1)
+            pygame.draw.line(Surface,Blanc,(auto.position_de_lauto_x,auto.position_de_lauto_y),((int(auto.position_de_lauto_x+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_2*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_2*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360)))))),1)
+            pygame.draw.line(Surface,Blanc,(auto.position_de_lauto_x,auto.position_de_lauto_y),((int(auto.position_de_lauto_x+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_3*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_3*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360)))))),1)
+            
+            if Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y+5)))==couleur_de_la_mort or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y+5)))==couleur_de_la_mort or Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y-1)))==couleur_de_la_mort or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y-1)))==couleur_de_la_mort:
+                print('mort')
+                rester=False
+
+            if Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y+5)))==couleur_point or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y+5)))==couleur_point or Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y-1)))==couleur_point or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y-1)))==couleur_point:
+                if auto.position_du_dernier_point_x!=auto.position_de_lauto_x or auto.position_de_lauto_y!= auto.position_du_dernier_point_y:
+                    #print('point')
+                    auto.pointage+=-1*auto.vitesse_de_lauto_fois_une_seconde
+                    auto.position_du_dernier_point_x= auto.position_de_lauto_x
+                    auto.position_du_dernier_point_y= auto.position_de_lauto_y
+                if auto.position_initial_de_lauto_x==auto.position_du_dernier_point_x and auto.position_initial_de_lauto_y==auto.position_du_dernier_point_y and abs(auto.vitesse_de_lauto_fois_une_seconde)>0:
+                    auto.pointage+=-10*auto.vitesse_de_lauto_fois_une_seconde
+                    print('on a fait un tour au point precis ==>point bonus<== ')
+
+            font=pygame.font.Font(None,40)
+            texte_de_la_victoire=font.render("Score "+str(int(auto.pointage)),False,Bleu)
+            Surface.blit(texte_de_la_victoire,(0,0))        
+            pygame.display.update() 
+
+while True:  
+run()
+
+
+                 
+
+                       
+</pre>
+                        </scroll-page>
+
+                        <scroll-page id="page-2">
+                            <nav class="video_">
+                                <h1  class="deux_titre">Video du projet </h1>
+                                <video width="250" height="150" controls>
+                                    <source src="jeu_auto_2.webm" type="video/webm">
+                                </video>
+                                <h1 class="deux_titre">Code pour le projet </h1>
+                                <nav class="info_sousvideo">
+                                    <pre>
+<a href="#page-1">1- Jeu sans IA </a>
+Jeu controlé à la main 0:00
+<a href="#page-2">2- Entrainement de l'IA</a> 
+Fichier de configuration config-feedforward 0:53
+Connexion et valeur des poids de IA 4:38
+<a href="#page-3">3- IA final</a> 
+Implémentation de l'IA entrainé 0:00
+                                    </pre>
+                                </nav>
+                            </nav>
+<pre class="prettyprint">
+import pygame, sys, os, neat
+from pygame.locals import*
+from math import sin, radians, cos,pi,tanh
+pygame.init()
+
+generation_total=2
+numero_de_generation=-1
+
+class automobile:
+def __init__(self):
+    self.position_de_lauto_x=100
+    self.position_de_lauto_y=100
+    self.position_initial_de_lauto_x=100
+    self.position_initial_de_lauto_y=100
+    self.angle_de_lauto=0
+    self.vitesse_de_lauto_fois_une_seconde=.5
+    self.vitesse_de_freinage=0.01  #pourcentage
+    self.vitesse_maximum=1*pi/2
+    self.pointage=0
+    self.position_du_dernier_point_x=-3424315143 #valeur non realiste
+    self.position_du_dernier_point_y=-42352345423 #valeur non realiste
+    #Distance par rapport au mur 
+    self.distance_1=1  #pour inciter le déplacement 
+    self.distance_2=1
+    self.distance_3=1
+    self.angle_1=0
+    self.angle_2=-315
+    self.angle_3=-45
+    self.validation_de_la_distance=False
+    #evite stagnation de l'auto
+    self.dernier_pointage=0
+    self.repetition_du_pointage=0
+    self.dernierecouleur=(50, 115, 161, 255)
+    
+
+def eval_genomes(genomes, config):
+        #couleur
+        #Gris = (100, 100, 100)
+        #Bleu_Marin = ( 60, 60, 100)
+        Blanc = (255, 255, 255)
+        #Rouge = (255, 0, 0)
+        Vert = ( 0, 255, 0)
+        Bleu = ( 0, 0, 255)
+        #Jaunne = (255, 255, 0)
+        #Orange = (255, 128, 0)
+        #Mauve = (255, 0, 255)
+        #Cyan = ( 0, 255, 255)
+        #Noir=(0,0,0)
+
+        #informations utiles
+        hauteur=600
+        largeur=600
+
+        #fenetre 
+        Surface = pygame.display.set_mode((largeur, hauteur), 0, 32)
+        pygame.display.set_caption('Jeu simple - automobile')
+        map_1 = pygame.image.load('map_1.png')
+        Surface.blit(map_1,(0,0))
+
+        #valeur de départ pour les boucles 
+        couleur_de_la_mort=(236, 10, 87, 255)
+        couleur_point=(50, 115, 161, 255)
+        rester=True
+        
+        global numero_de_generation
+        numero_de_generation+=1
+
+        nets = []
+        auto = []
+        ge = []
+
+        for  genome_id,genome in genomes:
+            genome.fitness = 0  # start with fitness level of 0
+            net = neat.nn.FeedForwardNetwork.create(genome, config)
+            nets.append(net)
+            auto.append(automobile())
+            ge.append(genome)
+        
+        time_mort=0
+
+        while rester and len(auto)>1:
+            time_mort+=1
+
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+            
+            for x, auto_massi in enumerate(auto):
+                output = nets[auto.index(auto_massi)].activate((auto[x].distance_1,auto[x].distance_2,auto[x].distance_3))
+            
+                if output[0] > 0.5:
+                    auto[x].vitesse_de_lauto_fois_une_seconde+=1/100
+                    
+                if output[0] < -0.5:
+                    auto[x].vitesse_de_lauto_fois_une_seconde+=-1/100
+
+                if output[1] > 0.5:
+                    auto[x].angle_de_lauto+=1.5/1 
+            
+                if output[1] < -0.5:
+                    auto[x].angle_de_lauto+=-1.5/1
+
+                if not output[0] > 0.5 and not output[1] > 0.5 and not  output[0] < -0.5 and not  output[1] < -0.5:
+                    if auto[x].vitesse_de_lauto_fois_une_seconde>0:
+                        auto[x].vitesse_de_lauto_fois_une_seconde+=-auto[x].vitesse_de_freinage*abs(auto[x].vitesse_de_lauto_fois_une_seconde)
+
+                    elif auto[x].vitesse_de_lauto_fois_une_seconde< 0:
+                        auto[x].vitesse_de_lauto_fois_une_seconde+=auto[x].vitesse_de_freinage*abs(auto[x].vitesse_de_lauto_fois_une_seconde)
+
+                if abs(auto[x].vitesse_de_lauto_fois_une_seconde)>auto[x].vitesse_maximum:
+                    auto[x].vitesse_de_lauto_fois_une_seconde=auto[x].vitesse_maximum*auto[x].vitesse_de_lauto_fois_une_seconde/abs(auto[x].vitesse_de_lauto_fois_une_seconde)
+
+                auto[x].position_de_lauto_x+=+auto[x].vitesse_de_lauto_fois_une_seconde*cos(auto[x].angle_de_lauto*((2*pi)/360))
+                auto[x].position_de_lauto_y+=+auto[x].vitesse_de_lauto_fois_une_seconde*sin(auto[x].angle_de_lauto*((2*pi)/360))                     
+                Surface.blit(map_1,(0,0))
+                pygame.draw.rect(Surface, Vert, (auto[x].position_de_lauto_x,auto[x].position_de_lauto_y,5,5))
+
+                if abs(auto[x].vitesse_de_lauto_fois_une_seconde) > 0.0005:
+                    #initialise la distance puis determine la distance reel par rapport au mur 
+                    auto[x].distance_1=1
+                    auto[x].distance_2=1
+                    auto[x].distance_3=1
+                    aa=0.3
+                    
+                    while Surface.get_at((int(auto[x].position_de_lauto_x+auto[x].distance_1*auto[x].vitesse_de_lauto_fois_une_seconde*(cos(auto[x].angle_1*((2*pi)/360)+(auto[x].angle_de_lauto)*((2*pi)/360)))),int(auto[x].position_de_lauto_y+auto[x].distance_1*auto[x].vitesse_de_lauto_fois_une_seconde*(sin(auto[x].angle_1*((2*pi)/360)+auto[x].angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort:
+                        auto[x].distance_1+=aa
+                    while Surface.get_at((int(auto[x].position_de_lauto_x+auto[x].distance_2*auto[x].vitesse_de_lauto_fois_une_seconde*(cos(auto[x].angle_2*((2*pi)/360)+(auto[x].angle_de_lauto)*((2*pi)/360)))),int(auto[x].position_de_lauto_y+auto[x].distance_2*auto[x].vitesse_de_lauto_fois_une_seconde*(sin(auto[x].angle_2*((2*pi)/360)+auto[x].angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort:
+                        auto[x].distance_2+=aa				
+                    while Surface.get_at((int(auto[x].position_de_lauto_x+auto[x].distance_3*auto[x].vitesse_de_lauto_fois_une_seconde*(cos(auto[x].angle_3*((2*pi)/360)+(auto[x].angle_de_lauto)*((2*pi)/360)))),int(auto[x].position_de_lauto_y+auto[x].distance_3*auto[x].vitesse_de_lauto_fois_une_seconde*(sin(auto[x].angle_3*((2*pi)/360)+auto[x].angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort:
+                        auto[x].distance_3+=aa
+                    
+                    #facteur de correction 
+                    auto[x].distance_1-=aa
+                    auto[x].distance_2-=aa
+                    auto[x].distance_3-=aa
+                    
+                
+                #dessin des lignes
+                pygame.draw.line(Surface,Blanc,(auto[x].position_de_lauto_x,auto[x].position_de_lauto_y),((int(auto[x].position_de_lauto_x+auto[x].distance_1*auto[x].vitesse_de_lauto_fois_une_seconde*(cos(auto[x].angle_1*((2*pi)/360)+(auto[x].angle_de_lauto)*((2*pi)/360)))),int(auto[x].position_de_lauto_y+auto[x].distance_1*auto[x].vitesse_de_lauto_fois_une_seconde*(sin(auto[x].angle_1*((2*pi)/360)+auto[x].angle_de_lauto*((2*pi)/360)))))),1)
+                pygame.draw.line(Surface,Blanc,(auto[x].position_de_lauto_x,auto[x].position_de_lauto_y),((int(auto[x].position_de_lauto_x+auto[x].distance_2*auto[x].vitesse_de_lauto_fois_une_seconde*(cos(auto[x].angle_2*((2*pi)/360)+(auto[x].angle_de_lauto)*((2*pi)/360)))),int(auto[x].position_de_lauto_y+auto[x].distance_2*auto[x].vitesse_de_lauto_fois_une_seconde*(sin(auto[x].angle_2*((2*pi)/360)+auto[x].angle_de_lauto*((2*pi)/360)))))),1)
+                pygame.draw.line(Surface,Blanc,(auto[x].position_de_lauto_x,auto[x].position_de_lauto_y),((int(auto[x].position_de_lauto_x+auto[x].distance_3*auto[x].vitesse_de_lauto_fois_une_seconde*(cos(auto[x].angle_3*((2*pi)/360)+(auto[x].angle_de_lauto)*((2*pi)/360)))),int(auto[x].position_de_lauto_y+auto[x].distance_3*auto[x].vitesse_de_lauto_fois_une_seconde*(sin(auto[x].angle_3*((2*pi)/360)+auto[x].angle_de_lauto*((2*pi)/360)))))),1)
+                
+                #permet de tuer les 'autos' qui ont un pointage qui n'evolue pas 
+                auto[x].dernier_pointage=auto[x].pointage
+
+                if Surface.get_at((int(auto[x].position_de_lauto_x+5),int(auto[x].position_de_lauto_y+5)))==couleur_point or Surface.get_at((int(auto[x].position_de_lauto_x-1),int(auto[x].position_de_lauto_y+5)))==couleur_point or Surface.get_at((int(auto[x].position_de_lauto_x+5),int(auto[x].position_de_lauto_y-1)))==couleur_point or Surface.get_at((int(auto[x].position_de_lauto_x-1),int(auto[x].position_de_lauto_y-1)))==couleur_point:
+                    if auto[x].position_du_dernier_point_x!=auto[x].position_de_lauto_x or auto[x].position_de_lauto_y!= auto[x].position_du_dernier_point_y:
+                        #print('point')
+                        auto[x].pointage+=1*abs(auto[x].vitesse_de_lauto_fois_une_seconde)
+                        auto[x].position_du_dernier_point_x= auto[x].position_de_lauto_x
+                        auto[x].position_du_dernier_point_y= auto[x].position_de_lauto_y
+                        ge[x].fitness=abs(auto[x].pointage)
+                    if auto[x].position_initial_de_lauto_x==auto[x].position_du_dernier_point_x and auto[x].position_initial_de_lauto_y==auto[x].position_du_dernier_point_y and abs(auto[x].vitesse_de_lauto_fois_une_seconde)>0:
+                        auto[x].pointage+=10*abs(auto[x].vitesse_de_lauto_fois_une_seconde)
+                        ge[x].fitness=abs(auto[x].pointage)
+                        #print('on a fait un tour au point precis ==>point bonus<== ')
+               
+                auto[x].pointage=abs(auto[x].pointage)+0.5*auto[x].vitesse_de_lauto_fois_une_seconde
+                ge[x].fitness=abs(auto[x].pointage)
+                ge[x].fitness_threshold=ge[x].fitness 
+                
+               
+                TUER_pointage_se_repete=False
+                if auto[x].pointage< auto[x].dernier_pointage+0.5:
+                    auto[x].repetition_du_pointage+=1
+                else:
+                    auto[x].repetition_du_pointage-=4
+                if auto[x].repetition_du_pointage==30 or time_mort>=900:
+                    #print('se repete')
+                    TUER_pointage_se_repete=True
+                if auto[x].dernierecouleur!=Surface.get_at((int(auto[x].position_de_lauto_x+2),int(auto[x].position_de_lauto_y+2))) or abs(auto[x].vitesse_de_lauto_fois_une_seconde)>0.1:
+                    if abs(auto[x].vitesse_de_lauto_fois_une_seconde)>0.01:
+                        auto[x].repetition_du_pointage=0
+                
+                   
+                auto[x].dernierecouleur=Surface.get_at((int(auto[x].position_de_lauto_x+2),int(auto[x].position_de_lauto_y+2)))
+
+                if Surface.get_at((int(auto[x].position_de_lauto_x+5),int(auto[x].position_de_lauto_y+5)))==couleur_de_la_mort or Surface.get_at((int(auto[x].position_de_lauto_x-1),int(auto[x].position_de_lauto_y+5)))==couleur_de_la_mort or Surface.get_at((int(auto[x].position_de_lauto_x+5),int(auto[x].position_de_lauto_y-1)))==couleur_de_la_mort or Surface.get_at((int(auto[x].position_de_lauto_x-1),int(auto[x].position_de_lauto_y-1)))==couleur_de_la_mort or TUER_pointage_se_repete==True:
+                    '''print('mort')
+                    print (time_mort)
+                    #rester=False'''
+                    nets.pop(auto.index(auto_massi))
+                    ge.pop(auto.index(auto_massi))
+                    auto.pop(auto.index(auto_massi))
+
+                font=pygame.font.Font(None,25)
+
+                texte_de_la_victoire=font.render("Génération   "+str(int((numero_de_generation))),False,Bleu)
+                Surface.blit(texte_de_la_victoire,(0,0))  
+                texte_de_la_victoire=font.render("Nombre d'enfants "+str(int((len(auto)))),False,Bleu)
+                Surface.blit(texte_de_la_victoire,(0,15))
+                texte_de_la_victoire=font.render("NB frames "+str(int((900-time_mort))),False,Bleu)
+                Surface.blit(texte_de_la_victoire,(0,30)) 
+
+
+            pygame.display.update()   
+
+def run(config_file):
+config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,neat.DefaultSpeciesSet, neat.DefaultStagnation,config_file)
+
+p = neat.Population(config)
+
+p.add_reporter(neat.StdOutReporter(True))
+stats = neat.StatisticsReporter()
+p.add_reporter(stats)
+
+global generation_total,numero_de_generation
+winner = p.run(eval_genomes, generation_total)
+print('\nBest genome:\n{!s}'.format(winner))
+
+
+
+
+if __name__ == '__main__':
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, 'config-feedforward.txt')
+run(config_path)
+                           
+                            
+</pre>
+                        </scroll-page>
+                        <scroll-page id="page-3">
+                            <nav class="video_">
+                                <h1  class="deux_titre">Video du projet </h1>
+                                <video width="250" height="150" controls>
+                                    <source src="jeu_auto_3.webm" type="video/webm">
+                                </video>
+                                <h1 class="deux_titre">Code pour le projet </h1>
+                                <nav class="info_sousvideo">
+                                    <pre>
+<a href="#page-1">1- Jeu sans IA </a>
+Jeu controlé à la main 0:00
+<a href="#page-2">2- Entrainement de l'IA</a> 
+Fichier de configuration config-feedforward 0:53
+Connexion et valeur des poids de IA 4:38
+<a href="#page-3">3- IA final</a> 
+Implémentation de l'IA entrainé 0:00
+                                    </pre>
+                                </nav>
+                            </nav>
+<pre class="prettyprint">
+import pygame, sys
+from pygame.locals import*
+from math import sin, radians, cos,pi,tanh
+pygame.init()
+
+#poids des différentes connexions
+WA1=weight=0.2762137872417747 
+WA2=weight=0.8102370294229524
+WA3=weight=0.5388347378373494
+
+WB1=0	
+WB2=1.5209585730958408
+WB3=-0.8923825174068142
+
+class automobile:
+def __init__(self):
+    self.position_de_lauto_x=100
+    self.position_de_lauto_y=100
+    self.position_initial_de_lauto_x=100
+    self.position_initial_de_lauto_y=100
+    self.angle_de_lauto=0
+    self.vitesse_de_lauto_fois_une_seconde=.5
+    self.vitesse_de_freinage=0.01  #pourcentage
+    self.vitesse_maximum=1*pi/2
+    self.pointage=0
+    self.position_du_dernier_point_x=-3424315143 #valeur non realiste
+    self.position_du_dernier_point_y=-42352345423 #valeur non realiste
+    #Distance par rapport au mur 
+    self.distance_1=1  #pour inciter le déplacement 
+    self.distance_2=1
+    self.distance_3=1
+    self.angle_1=0
+    self.angle_2=-315
+    self.angle_3=-45
+    self.validation_de_la_distance=False
+    #evite stagnation de l'auto
+    self.dernier_pointage=0
+    self.repetition_du_pointage=0
+    self.dernierecouleur=(50, 115, 161, 255)
+
+def run():
+        #couleur
+        '''Gris = (100, 100, 100)
+        Bleu_Marin = ( 60, 60, 100)
+        Rouge = (255, 0, 0)
+        Jaunne = (255, 255, 0)
+        Orange = (255, 128, 0)
+        Mauve = (255, 0, 255)
+        Cyan = ( 0, 255, 255)
+        Noir=(0,0,0)'''
+        Blanc = (255, 255, 255)
+        Vert = ( 0, 255, 0)
+        Bleu = ( 0, 0, 255)
+
+        #informations utiles
+        hauteur=600
+        largeur=600
+
+        #fenetre 
+        Surface = pygame.display.set_mode((largeur, hauteur), 0, 32)
+        pygame.display.set_caption('Jeu simple - automobile')
+        map_1 = pygame.image.load('map_1.png')
+        Surface.blit(map_1,(0,0))
+
+        #valeur de départ pour les boucles 
+        auto=automobile()
+        couleur_de_la_mort=(236, 10, 87, 255)
+        couleur_point=(50, 115, 161, 255)
+        rester=True
+        while rester:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+            global WA1,WA2,WA3,WB2,WB3,WB1
+            output=[tanh(auto.distance_1*WA1+auto.distance_2*WA2+auto.distance_3*WA3),tanh(auto.distance_1*WB1+auto.distance_2*WB2+auto.distance_3*WB3)]
+           
+            if output[0] > 0.5:
+                auto.vitesse_de_lauto_fois_une_seconde+=1/100
+                    
+            if output[0] < -0.5:
+                auto.vitesse_de_lauto_fois_une_seconde+=-1/100
+
+            if output[1] > 0.5:
+                auto.angle_de_lauto+=1.5/1 
+            
+            if output[1] < -0.5:
+                auto.angle_de_lauto+=-1.5/1
+
+            if not output[0] > 0.5 and not output[1] > 0.5 and not  output[0] < -0.5 and not  output[1] < -0.5:
+                if auto.vitesse_de_lauto_fois_une_seconde>0:
+                    auto.vitesse_de_lauto_fois_une_seconde+=-auto.vitesse_de_freinage*abs(auto.vitesse_de_lauto_fois_une_seconde)
+
+                elif auto.vitesse_de_lauto_fois_une_seconde < 0:
+                    auto.vitesse_de_lauto_fois_une_seconde+=auto.vitesse_de_freinage*abs(auto.vitesse_de_lauto_fois_une_seconde)
+
+            if abs(auto.vitesse_de_lauto_fois_une_seconde)>auto.vitesse_maximum:
+                auto.vitesse_de_lauto_fois_une_seconde=auto.vitesse_maximum*auto.vitesse_de_lauto_fois_une_seconde/abs(auto.vitesse_de_lauto_fois_une_seconde)
+
+            auto.position_de_lauto_x+=+auto.vitesse_de_lauto_fois_une_seconde*cos(auto.angle_de_lauto*((2*pi)/360))
+            auto.position_de_lauto_y+=+auto.vitesse_de_lauto_fois_une_seconde*sin(auto.angle_de_lauto*((2*pi)/360))                     
+            Surface.blit(map_1,(0,0))
+            pygame.draw.rect(Surface, Vert, (auto.position_de_lauto_x,auto.position_de_lauto_y,5,5))
+
+            #initialise la distance puis determine la distance reel par rapport au mur 
+            auto.distance_1=1
+            auto.distance_2=1
+            auto.distance_3=1
+           
+            while Surface.get_at((int(auto.position_de_lauto_x+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_1*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_1*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort and abs(auto.vitesse_de_lauto_fois_une_seconde) > 0 :
+                auto.distance_1+=.5
+            while Surface.get_at((int(auto.position_de_lauto_x+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_2*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_2*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort and abs(auto.vitesse_de_lauto_fois_une_seconde) > 0 :
+                auto.distance_2+=.5					
+            while Surface.get_at((int(auto.position_de_lauto_x+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_3*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_3*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360))))))!=couleur_de_la_mort and abs(auto.vitesse_de_lauto_fois_une_seconde) > 0 :
+                auto.distance_3+=.5
+          
+            #facteur de correction 
+            auto.distance_1-=.5
+            auto.distance_2-=.5
+            auto.distance_3-=.5
+
+            #dessin des lignes
+            pygame.draw.line(Surface,Blanc,(auto.position_de_lauto_x,auto.position_de_lauto_y),((int(auto.position_de_lauto_x+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_1*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_1*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_1*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360)))))),1)
+            pygame.draw.line(Surface,Blanc,(auto.position_de_lauto_x,auto.position_de_lauto_y),((int(auto.position_de_lauto_x+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_2*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_2*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_2*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360)))))),1)
+            pygame.draw.line(Surface,Blanc,(auto.position_de_lauto_x,auto.position_de_lauto_y),((int(auto.position_de_lauto_x+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(cos(auto.angle_3*((2*pi)/360)+(auto.angle_de_lauto)*((2*pi)/360)))),int(auto.position_de_lauto_y+auto.distance_3*auto.vitesse_de_lauto_fois_une_seconde*(sin(auto.angle_3*((2*pi)/360)+auto.angle_de_lauto*((2*pi)/360)))))),1)
+            
+            if Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y+5)))==couleur_de_la_mort or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y+5)))==couleur_de_la_mort or Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y-1)))==couleur_de_la_mort or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y-1)))==couleur_de_la_mort:
+                print('mort')
+                rester=False
+
+            if Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y+5)))==couleur_point or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y+5)))==couleur_point or Surface.get_at((int(auto.position_de_lauto_x+5),int(auto.position_de_lauto_y-1)))==couleur_point or Surface.get_at((int(auto.position_de_lauto_x-1),int(auto.position_de_lauto_y-1)))==couleur_point:
+                if auto.position_du_dernier_point_x!=auto.position_de_lauto_x or auto.position_de_lauto_y!= auto.position_du_dernier_point_y:
+                    #print('point')
+                    auto.pointage+=1*auto.vitesse_de_lauto_fois_une_seconde
+                    auto.position_du_dernier_point_x= auto.position_de_lauto_x
+                    auto.position_du_dernier_point_y= auto.position_de_lauto_y
+                if auto.position_initial_de_lauto_x==auto.position_du_dernier_point_x and auto.position_initial_de_lauto_y==auto.position_du_dernier_point_y and abs(auto.vitesse_de_lauto_fois_une_seconde)>0:
+                    auto.pointage+=10*auto.vitesse_de_lauto_fois_une_seconde
+                    print('on a fait un tour au point precis ==>point bonus<== ')
+            auto.pointage+=0.1
+
+            font=pygame.font.Font(None,40)
+            texte_de_la_victoire=font.render("Score "+str(int(auto.pointage)),False,Bleu)
+            Surface.blit(texte_de_la_victoire,(0,0))        
+            pygame.display.update() 
+
+while True:  
+run()
+
+
+         
+                            
+</pre>
+                        </scroll-page>
+                      </scroll-container></nav>
+
+
+    <scroll-page id="page-3">
+
+      <div class="separateur1">
+      
+      </div>
+  
+      <div class="separateur2">
+        
+      </div>
+
+
+    </scroll-page>
+  </scroll-container>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <input type="checkbox" id="menu" name="menu" class="menu-checkbox">
+    <div class="menu">
+      <label class="menu-toggle" for="menu"><span>Toggle</span></label>
+      <ul>
+ 
+
+   
+        <li>
+            <label for="menu-3">CATIA V5</label>
+            <input type="checkbox" id="menu-3" name="menu-3" class="menu-checkbox">
+            <div class="menu">
+              <label class="menu-toggle" for="menu-3"><span>Toggle</span></label>
+              <ul>
+                <li>
+                  <a href="catia.html">Aventador</a>
+                </li>
+              
+             
+              </ul>
+            </div>
+          </li>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+          <li>
+            <label for="menu-4">Python</label>
+            <input type="checkbox" id="menu-4" name="menu-4" class="menu-checkbox">
+            <div class="menu">
+              <label class="menu-toggle" for="menu-4"><span>Toggle</span></label>
+              <ul>
+                <li>
+                  <a href="pathfindin.html">Path finding algorithms </a>
+                </li>
+                <li>
+                  <a href="memoire.html">Jeu de mémoire </a>
+                </li>
+                <li>
+                  <a href="python_car.html">Car - NEAT</a>
+                </li>
+               
+              </ul>
+            </div>
+          </li>
+          
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+          <!--
+          
+          <li>
+            <label for="menu-5">Menu-5</label>
+            <input type="checkbox" id="menu-5" name="menu-5" class="menu-checkbox">
+            <div class="menu">
+              <label class="menu-toggle" for="menu-5"><span>Toggle</span></label>
+              <ul>
+                <li>
+                  <a href="#">Menu-5-1</a>
+                </li>
+                <li>
+                  <a href="#">Menu-5-2</a>
+                </li>
+                <li>
+                  <a href="#">Menu-5-3</a>
+                </li>
+                <li>
+                  <a href="#">Menu-5-4</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        
+   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </ul>
+    </div>
+    
+  </div><!-- #wrapper -->
+
+</body>
+</html>

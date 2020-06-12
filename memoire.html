@@ -1,0 +1,508 @@
+<link rel="stylesheet" href="index.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=py&amp;skin="></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hani Massinissa</title>
+</head>
+<body>
+  
+
+
+<div id="wrapper">
+    
+  
+
+
+    <nav class="top_top">
+        <h2 class="titre_top">Hani Massinissa - Jeu de memoire <a  href="#" class="fa fa-github boutoun_github"></a> </h2>
+                        <!--  Les lignes qui suivent varient en fonction de la page dont il est question; les lignes plus haut sont les mêmes pour toutes les pages      -->
+                        <nav>
+                            <a href="#page-1">1</a>
+                            
+                         
+                          </nav>
+                          <scroll-container>
+                            <scroll-page id="page-1">
+                                <nav class="video_">
+                                    <h1  class="deux_titre">Video du projet </h1>
+                                    <video width="250" height="150" controls>
+                                        <source src="Jeu_de_memoire.webm" type="video/webm">
+                                    </video>
+                                    <h1 class="deux_titre">Code pour le projet </h1>
+                                    
+                                </nav>
+                            
+                          
+<pre class="prettyprint">
+    import pygame, sys ,random
+
+    from pygame.locals import*
+    pygame.init()
+    
+    FPS=75
+    temps=pygame.time.Clock()
+    
+    #informations utiles
+    hauteur=600
+    largeur=900
+    
+    largeur_jeux=largeur-2*150
+    hauteur_jeux=hauteur-2*50
+    
+    vitesse_d_affichage=250 #en miliseconde
+    
+    #couleur/fomre et Couleur/forme dans une liste
+    Gris = (100, 100, 100)
+    Bleu_Marin = ( 60, 60, 100)
+    Blanc = (255, 255, 255)
+    Rouge = (255, 0, 0)
+    Vert = ( 0, 255, 0)
+    Bleu = ( 0, 0, 255)
+    Jaunne = (255, 255, 0)
+    Orange = (255, 128, 0)
+    Mauve = (255, 0, 255)
+    Cyan = ( 0, 255, 255)
+    Noir=(0,0,0)
+    
+    #liste de couleur
+    couleur=[Jaunne,Mauve,Rouge,Vert,Orange,Cyan,Blanc]
+    
+    #fenetre 
+    
+    Surface = pygame.display.set_mode((largeur, hauteur), 0, 32)
+    pygame.display.set_caption('Jeu simple')
+    
+    #dessin de l'interface de base => le "fond d'écran" <=
+    Surface.fill(Bleu_Marin)
+    pygame.draw.rect(Surface, Noir,(150,50,largeur_jeux,hauteur_jeux))
+    
+    i=150
+    for repetition_1 in range(0,3):
+        i+=(largeur_jeux/4)
+        pygame.draw.line(Surface, Bleu, (i,50), (i,hauteur-50),3)
+    
+    i=50
+    for repetion_2 in range(0,2):
+        i+=(hauteur_jeux/3)
+        pygame.draw.line(Surface, Bleu, (150,i), (largeur-150,i),3)
+    
+    
+    #dessins des différetes forme =>-cercle-rectangle/carré-cercle dans un rectangle-<=
+    def dessiner_un_rectangle(position,couleur):
+        pygame.draw.rect(Surface, couleur, (position[0]-45*0.5,position[1]-40*0.5,45,40),5)
+    
+    def dessiner_un_cercle(position,couleur):
+        pygame.draw.circle(Surface, couleur, (position[0],position[1]), (int(60*0.5)), 5)
+    
+    def dessiner_un_cercle_et_rectangle(position,couleur):
+        pygame.draw.ellipse(Surface, couleur, (position[0]-40*0.5,position[1]-40*0.5,40,40),5)
+        pygame.draw.rect(Surface, couleur, (position[0]-40*0.5,position[1]-40*0.5,40,40),5)
+    
+    
+    #position des différentes case de 1 à 12 
+    position_1=(227,132)
+    poistion_2=(377,132)
+    position_3=(527,132)
+    position_4=(677,132)
+    position_5=(227,301)
+    position_6=(377,301)
+    position_7=(527,301)
+    position_8=(677,301)
+    position_9=(227,468)
+    position_10=(377,468)
+    position_11=(527,468)
+    position_12=(677,468)
+    
+    
+    position=[position_1,poistion_2,position_3,position_4,position_5,position_6,position_7,position_8,position_9,position_10,position_11,position_12]
+    endroit=[0,1,2,3,4,5,6,7,8,9,10,11]
+    
+    position_initial=[position_1,poistion_2,position_3,position_4,position_5,position_6,position_7,position_8,position_9,position_10,position_11,position_12]
+    
+    position_non_changée=[position_1,poistion_2,position_3,position_4,position_5,position_6,position_7,position_8,position_9,position_10,position_11,position_12]
+    endroit_non_changée=[0,1,2,3,4,5,6,7,8,9,10,11]
+    #mélange des couleurs et des positions
+    random.shuffle(position)
+    random.shuffle(couleur)
+    random.shuffle(position_non_changée)
+    endroit2=endroit
+    
+    #dessiner les figures de bases de facon aléatoire sur le tableau de jeu
+    k=0
+    position_dun_rectangle=[]
+    couleur_dun_rectangle=[]
+    
+    position_dun_cercle=[]
+    couleur_dun_cercle=[]
+    
+    position_dun_cercle_et_rectangle=[]
+    couleur_dun_cercle_et_rectangle=[]
+    for color in couleur:
+        
+        if k==0 or k==1:
+            dessiner_un_rectangle(position[endroit[0]],color)
+            dessiner_un_rectangle(position[endroit[1]],color)
+    
+            position_dun_rectangle.append(position[endroit[0]])
+            position_dun_rectangle.append(position[endroit[1]])
+            couleur_dun_rectangle.append(color)
+            couleur_dun_rectangle.append(color)
+    
+        elif k==2 or k==3:
+            dessiner_un_cercle(position[endroit[0]],color)
+            dessiner_un_cercle(position[endroit[1]],color)
+    
+            position_dun_cercle.append(position[endroit[0]])
+            position_dun_cercle.append(position[endroit[1]])
+            couleur_dun_cercle.append(color)
+            couleur_dun_cercle.append(color)
+            
+        elif k==4 or k==5:
+            dessiner_un_cercle_et_rectangle(position[endroit[0]],color)
+            dessiner_un_cercle_et_rectangle(position[endroit[1]],color)
+    
+            position_dun_cercle_et_rectangle.append(position[endroit[0]])
+            position_dun_cercle_et_rectangle.append(position[endroit[1]])
+            couleur_dun_cercle_et_rectangle.append(color)
+            couleur_dun_cercle_et_rectangle.append(color)
+        k+=1
+        if len(endroit)>2:
+            del endroit[0]
+            del endroit[0]
+    
+    #fonction pour cacher les cases
+    def cache_les_cases(pos,validite):
+        if validite==True:
+            a=120
+            b=a*0.5
+            pygame.draw.rect(Surface, Noir, [pos[0]-b,pos[1]-b,a,a], )
+    
+    
+    
+    #permet de redessiner la bonne figure
+    def dessine_sans_la_couverture(i,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial):
+        k=-1
+        for pos in position_dun_cercle_et_rectangle:
+            k+=1
+            if pos[0]==position_initial[i][0]:
+                if pos[1]== position_initial[i][1]: 
+                    dessiner_un_cercle_et_rectangle(pos,couleur_dun_cercle_et_rectangle[k])
+                    position_du_clic=pos
+                    couleur_du_clic=couleur_dun_cercle_et_rectangle[k]
+                    forme_du_clic="cercle et rectangle"
+        k=-1
+        for pos in position_dun_cercle:
+            k+=1
+            if pos[0]==position_initial[i][0]:
+                if pos[1]== position_initial[i][1]: 
+                    dessiner_un_cercle(pos,couleur_dun_cercle[k])
+                    position_du_clic=pos
+                    couleur_du_clic=couleur_dun_cercle_et_rectangle[k]
+                    forme_du_clic="cercle"
+        k=-1
+        for pos in position_dun_rectangle:
+            k+=1
+            if pos[0]==position_initial[i][0]:
+                if pos[1]== position_initial[i][1]: 
+                    dessiner_un_rectangle(pos,couleur_dun_rectangle[k])
+                    position_du_clic=pos
+                    couleur_du_clic=couleur_dun_cercle_et_rectangle[k]
+                    forme_du_clic="rectangle"
+        return forme_du_clic,position_du_clic,couleur_du_clic
+    
+    #verifie que la position n'est pas la meme
+    def  fonction_empeche_de_cliquer_deux_fois(premiere_case_enregistree,position_du_clic,position_initial):
+        valeur_de_retour=False
+        position_de_la_case=[]
+        for V in [premiere_case_enregistree[1],position_du_clic]:
+            z=-1
+            for verification_de_la_case_a_ne_pas_masquer in position_initial:
+                z+=1
+                if V==verification_de_la_case_a_ne_pas_masquer:
+                    position_de_la_case.append(z)
+    
+        if len(position_de_la_case)>1:
+            if position_de_la_case[0]==position_de_la_case[1]:
+                valeur_de_retour=True
+        return valeur_de_retour
+    
+    #verifie la victoire du joueur
+    def Victoire_tout_est_False(validite):
+        A="victoire"
+        for i in validite:
+            if i == True:
+                A="pas encore"  
+        if A=="victoire": 
+            font=pygame.font.Font(None,200)
+            texte_de_la_victoire=font.render("Victoire:)",False,Bleu)
+            Surface.blit(texte_de_la_victoire,(150,301-50))
+    
+    
+    #valeur de départ pour les loops et autres fonctionalitées
+    premiere_case_enregistree=None
+    premiere_fois=True 
+    on_quitte=False #False
+    souris_click=False
+    pygame.display.update()
+    first_time_EVER=True
+    validite=[True,True,True,True,True,True,True,True,True,True,True,True]
+    empeche_de_cliquer_deux_fois=[True,True,True,True,True,True,True,True,True,True,True,True]
+    
+    
+    while True:
+        Victoire_tout_est_False(validite)
+        pygame.display.update()
+        temps.tick(FPS)
+        #permet de quitter le jeu
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            else:    
+                if premiere_fois==True:#couvre les cases avec un delais   
+                    premiere_fois=False
+                    while on_quitte==False:
+    
+                        if first_time_EVER==True:
+                            cache_les_cases(position_non_changée[endroit_non_changée[0]],validite[endroit_non_changée[0]])
+                            if len(endroit_non_changée)==1:
+                                    on_quitte=True 
+                                    first_time_EVER=False 
+                                    pygame.time.wait(vitesse_d_affichage)
+                                    pygame.display.update()
+                            else:
+                                    del endroit_non_changée[0]
+                                    pygame.time.wait(vitesse_d_affichage)
+                                    pygame.display.update()
+                        elif first_time_EVER==False:
+                            for i in range(0,12):
+                                cache_les_cases(position_initial[i],validite[i])
+                                pygame.time.wait(100)
+                                pygame.display.update()
+                                if i==11:
+                                    on_quitte=True 
+                                    first_time_EVER=False 
+                                    pygame.time.wait(100)
+                                    pygame.display.update()
+    
+            if event.type==MOUSEBUTTONUP:
+                position_souris_x,position_souris_y=event.pos
+                souris_click=True  
+                       
+    
+    #verifie quelle case a été touché par la souris et dessine la bonne forme avec la bonne couleur =>boucle for possible mais à cause de la petite taille du tableau je trouve plus rapide de copie coller<=
+                if position_souris_x >position_1[0]-60 and position_souris_x < position_1[0]+60:
+                    if position_souris_y > position_1[1]-60 and position_souris_y< position_1[1]+60:#print("case1")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(0,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_5[1]-60 and position_souris_y< position_5[1]+60:#print("case5")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(4,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_9[1]-60 and position_souris_y< position_9[1]+60:#print("case9")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(8,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+               
+                if position_souris_x >poistion_2[0]-60 and position_souris_x< poistion_2[0]+60:
+                    if position_souris_y >poistion_2[1]-60 and position_souris_y< poistion_2[1]+60:#print("case2")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(1,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_6[1]-60 and position_souris_y< position_6[1]+60:#print("case6")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(5,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_10[1]-60 and position_souris_y< position_10[1]+60:#print("case10")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(9,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+    
+                if position_souris_x >position_3[0]-60 and position_souris_x< position_3[0]+60:
+                    if position_souris_y >position_3[1]-60 and position_souris_y< position_3[1]+60:#print("case3")
+                       forme_du_clic,position_du_clic,couleur_du_clic= dessine_sans_la_couverture(2,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_7[1]-60 and position_souris_y< position_7[1]+60:#print("case7")
+                       forme_du_clic,position_du_clic,couleur_du_clic= dessine_sans_la_couverture(6,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_11[1]-60 and position_souris_y< position_11[1]+60:#print("case11")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(10,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+    
+                if position_souris_x >position_4[0]-60 and position_souris_x< position_4[0]+60:
+                    if position_souris_y >position_4[1]-60 and position_souris_y< position_4[1]+60:#print("case4")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(3,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_8[1]-60 and position_souris_y< position_8[1]+60:#print("case8")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(7,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+                    elif position_souris_y >position_12[1]-60 and position_souris_y< position_12[1]+60:#print("case12")
+                        forme_du_clic,position_du_clic,couleur_du_clic=dessine_sans_la_couverture(11,couleur_dun_rectangle,couleur_dun_cercle,position_dun_rectangle,position_dun_cercle,couleur_dun_cercle_et_rectangle,position_dun_cercle_et_rectangle,position_initial)
+    #regarde si il y'a deja eu une case choisie et si une case a deja été choisie s'assure que le joeur n'a pas choisi deux fois la meme case 
+                if premiere_case_enregistree!=None:
+                    if fonction_empeche_de_cliquer_deux_fois(premiere_case_enregistree,position_du_clic,position_initial)==False:
+                        if forme_du_clic==premiere_case_enregistree[0]:
+                            if couleur_du_clic==premiere_case_enregistree[2]:
+                                for V in [premiere_case_enregistree[1],position_du_clic]:
+                                    z=-1
+                                    for verification_de_la_case_a_ne_pas_masquer in position_initial:
+                                        z+=1
+                                        if V==verification_de_la_case_a_ne_pas_masquer:
+                                            
+                                            validite[z]=False
+                    # réinitialise  les valeur de base                                       
+                    premiere_case_enregistree=None
+                    souris_click=False
+                    premiere_fois=True
+                    on_quitte=False 
+                else:
+                    premiere_case_enregistree=(forme_du_clic,position_du_clic,couleur_du_clic) 
+                                            
+        pygame.display.update()
+        temps.tick(FPS*10)
+        
+    
+                                     
+                                    
+    
+    
+    
+    
+    
+    
+    
+    
+                     
+
+                           
+</pre>
+                            </scroll-page>
+
+                            <scroll-page id="page-2">
+                                <nav class="video_">
+                                 
+                                    
+                                    
+                                </nav>
+
+                            </scroll-page>
+                          </scroll-container>
+    </nav>
+   
+
+    
+
+
+
+
+    
+
+
+
+    <input type="checkbox" id="menu" name="menu" class="menu-checkbox">
+    <div class="menu">
+      <label class="menu-toggle" for="menu"><span>Toggle</span></label>
+      <ul>
+ 
+
+
+
+        
+
+        
+      
+        <li>
+          <label for="menu-3">CATIA V5</label>
+          <input type="checkbox" id="menu-3" name="menu-3" class="menu-checkbox">
+          <div class="menu">
+            <label class="menu-toggle" for="menu-3"><span>Toggle</span></label>
+            <ul>
+              <li>
+                <a href="catia.html">Aventador</a>
+              </li>
+            
+           
+            </ul>
+          </div>
+        </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <li>
+          <label for="menu-4">Python</label>
+          <input type="checkbox" id="menu-4" name="menu-4" class="menu-checkbox">
+          <div class="menu">
+            <label class="menu-toggle" for="menu-4"><span>Toggle</span></label>
+            <ul>
+              <li>
+                <a href="pathfindin.html">Path finding algorithms </a>
+              </li>
+              <li>
+                <a href="memoire.html">Jeu de mémoire </a>
+              </li>
+              <li>
+                <a href="python_car.html">Car - NEAT</a>
+              </li>
+             
+            </ul>
+          </div>
+        </li>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!--
+        
+        <li>
+          <label for="menu-5">Menu-5</label>
+          <input type="checkbox" id="menu-5" name="menu-5" class="menu-checkbox">
+          <div class="menu">
+            <label class="menu-toggle" for="menu-5"><span>Toggle</span></label>
+            <ul>
+              <li>
+                <a href="#">Menu-5-1</a>
+              </li>
+              <li>
+                <a href="#">Menu-5-2</a>
+              </li>
+              <li>
+                <a href="#">Menu-5-3</a>
+              </li>
+              <li>
+                <a href="#">Menu-5-4</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      
+ -->
+
+
+
+
+
+
+
+
+
+
+
+        
+      </ul>
+    </div>
+  </div><!-- #wrapper -->
+
+</body>
+</html>

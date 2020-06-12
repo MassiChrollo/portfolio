@@ -1,0 +1,472 @@
+<link rel="stylesheet" href="index.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=py&amp;skin="></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hani Massinissa</title>
+</head>
+<body>
+  
+
+
+<div id="wrapper">
+    
+  
+
+
+ 
+  <nav class="top_top">
+    <h2 class="titre_top">Hani Massinissa - Path finding algorithms <a  href="#" class="fa fa-github boutoun_github"></a> </h2>
+                    <!--  Les lignes qui suivent varient en fonction de la page dont il est question; les lignes plus haut sont les mêmes pour toutes les pages      -->
+                    <nav>
+                        <a href="#page-1">1</a>
+                        
+                     
+                      </nav>
+                      <scroll-container>
+                        <scroll-page id="page-1">
+                            <nav class="video_">
+                                <h1  class="deux_titre">Video du projet </h1>
+                                <video width="250" height="150" controls>
+                                    <source src="path_finding.webm" type="video/webm">
+                                </video>
+                                <h1 class="deux_titre">Code pour le projet </h1>
+                                
+                            </nav>
+                        
+                      
+<pre class="prettyprint">
+import pygame, sys ,random,pygame.mixer_music
+from pygame.locals import*
+pygame.init()
+FPS=60
+temps=pygame.time.Clock()
+
+#informations utiles
+hauteur=600
+largeur=hauteur
+
+Espace=20
+espace_entre_les_lignes=range(0,hauteur+Espace,Espace)
+Prendre_la_position_espace_entre_les_lignes=range(Espace,hauteur+Espace,Espace)
+
+#couleur
+Gris = (100, 100, 100)
+Bleu_Marin = ( 60, 60, 100)
+Blanc = (255, 255, 255)
+Rouge = (255, 0, 0)
+Vert = ( 0, 255, 0)
+Bleu = ( 0, 0, 255)
+Jaunne = (255, 255, 0)
+Orange = (255, 128, 0)
+Mauve = (255, 0, 255)
+Cyan = ( 0, 255, 255)
+Noir=(0,0,0)
+
+#fenetre 
+Surface = pygame.display.set_mode((largeur, hauteur), 0, 32)
+pygame.display.set_caption('Jeu simple - Breadth First Search')
+
+#dessin de l'interface de base => le "fond d'écran" <=
+Surface.fill(Blanc)
+
+#dessine les séparation  et stock leurs position en x et y ==>le cadrillage<==
+for i in espace_entre_les_lignes:
+    pygame.draw.line(Surface, Jaunne, (i,0), (i,hauteur))
+    pygame.draw.line(Surface, Jaunne, (0,i), (largeur,i))
+    
+position_des_cases=[]    
+for i in Prendre_la_position_espace_entre_les_lignes:
+    for j in Prendre_la_position_espace_entre_les_lignes:
+        pygame.draw.rect(Surface, Rouge, (i-Espace/2,j-Espace/2,.5,.5), ) # représentation visuelle de "position_des_cases"
+        position_des_cases.append([i-Espace/2,j-Espace/2])
+
+#dessine une case jaunne sur le boutons  de départ et notifie de la fonction de la case puis remet le tableau de jeu dans une condition "fonctionel"
+pygame.draw.rect(Surface, Jaunne, (position_des_cases[0][0]-Espace*0.5,position_des_cases[0][1]-Espace*0.5,Espace,Espace))
+font=pygame.font.Font(None,Espace)
+texte_de_la_victoire=font.render("<== demarre l'algo",False,Bleu)
+Surface.blit(texte_de_la_victoire,(position_des_cases[30][0]-Espace*0.5,position_des_cases[30][1]-Espace*0.5))
+
+pygame.display.update()
+temps.tick(FPS)
+pygame.time.wait(1000)
+
+
+for lll in range(0,7):
+    pygame.draw.rect(Surface, Blanc, (position_des_cases[i][0]-Espace*0.5,position_des_cases[i][1]-Espace*0.5,Espace,Espace))
+    pygame.draw.rect(Surface, Rouge, (position_des_cases[i][0],position_des_cases[i][1],.5,.5), )  
+    i+=30
+for l in espace_entre_les_lignes:
+    pygame.draw.line(Surface, Jaunne, (l,0), (l,hauteur))
+    pygame.draw.line(Surface, Jaunne, (0,l), (largeur,l))
+
+#permet de passer de la valeur en pixel au numéro de case dont il est question
+def Position_Pixel_en_numero_de_case(position_xy,position_des_cases,Espace):
+    for case in range(0,len(position_des_cases)):
+        if position_xy[0] < position_des_cases[case][0]+Espace*0.5 and position_xy[0] > position_des_cases[case][0]-Espace*0.5:
+            if position_xy[1] < position_des_cases[case][1]+Espace*0.5 and position_xy[1] > position_des_cases[case][1]-Espace*0.5:
+                return case
+    return None
+ 
+#dessine un rectangle noir sur la case cliquée par la souris 
+def dessine_un_petit_rectangle_noir(position_des_cases,Espace,case):
+    pygame.draw.rect(Surface, Noir, (position_des_cases[case][0]-Espace*0.5,position_des_cases[case][1]-Espace*0.5,Espace,Espace)) #représentation des cases 
+
+#dessinie le point de depart
+def dessine_le_point_de_depart(position_des_cases,Espace,case):
+    pygame.draw.rect(Surface, Vert, (position_des_cases[case][0]-Espace*0.5,position_des_cases[case][1]-Espace*0.5,Espace,Espace)) #représentation de la case de depart 
+
+#dessine le point d'arrivé 
+def dessine_le_point_darrive(position_des_cases,Espace,case):
+    pygame.draw.rect(Surface, Rouge, (position_des_cases[case][0]-Espace*0.5,position_des_cases[case][1]-Espace*0.5,Espace,Espace)) #représentation de la case d'arrivé    
+
+def dessine_un_petit_rectangle_pour_le_chemin(position_des_cases,Espace,case):
+    pygame.draw.rect(Surface, Mauve, (position_des_cases[case][0]-Espace*0.5+1,position_des_cases[case][1]-Espace*0.5+1,Espace-1,Espace-1))
+
+def on_a_trouvé_le_chemin(position_des_cases,Espace,case):
+    pygame.draw.rect(Surface, Vert, (position_des_cases[case][0]-Espace*0.5,position_des_cases[case][1]-Espace*0.5,Espace,Espace))
+
+def on_dessine_le_chemin(position_des_cases,Espace,case):
+    pygame.draw.rect(Surface, Jaunne, (position_des_cases[case][0]-Espace*0.5+2,position_des_cases[case][1]-Espace*0.5+2,Espace-2,Espace-2))
+
+bordure_du_haut=[]
+haut=0
+bordure_du_bas=[]
+Bas=29
+cote_gauche=[]
+gauche=0
+cote_droit=[]
+
+for cote in range(0,30):
+    bordure_du_haut.append(haut)
+    haut+=30
+    
+    bordure_du_bas.append(Bas)
+    Bas+=30
+
+    cote_gauche.append(gauche)
+    
+    cote_droit.append(gauche+(30*30)-30)
+    gauche+=1
+
+def algo_de_recherche_Breadth_first_Search(Frontiere,bordure_du_haut,bordure_du_bas,cote_droit,cote_gauche,position_des_cases,Espace,case_de_deoart_valeurcase,case_en_noir_valeurcase,case_darrive_valeurcase):
+    dictionaire_des_multiples_chemins={}
+    ancienne_frontiere=[]
+    v=0
+    while True:    
+        valeur_Frontiere=Frontiere
+        Frontiere=[]
+        deja_visite=[]
+        Chemin_attein=False
+        k=1
+        for element in valeur_Frontiere:
+        
+            if element not in bordure_du_haut and element-1 not in deja_visite and element-1!=case_de_deoart_valeurcase[0] and element-1 not in case_en_noir_valeurcase:
+                nouvel_element=element-1
+                dessine_un_petit_rectangle_pour_le_chemin(position_des_cases,Espace,nouvel_element)
+                Frontiere.append(nouvel_element)
+                deja_visite.append(nouvel_element)
+
+                dictionaire_des_multiples_chemins[nouvel_element]=element
+
+                if case_darrive_valeurcase[0]==nouvel_element:
+                    on_a_trouvé_le_chemin(position_des_cases,Espace,nouvel_element)
+                    Chemin_attein=True   
+
+            if element not in bordure_du_bas and element+1 not in deja_visite and element+1!=case_de_deoart_valeurcase[0] and element+1 not in case_en_noir_valeurcase:
+                nouvel_element=element+1
+                dessine_un_petit_rectangle_pour_le_chemin(position_des_cases,Espace,nouvel_element)
+                Frontiere.append(nouvel_element)
+                deja_visite.append(nouvel_element)
+
+                dictionaire_des_multiples_chemins[nouvel_element]=element
+
+                if case_darrive_valeurcase[0]==nouvel_element:
+                    on_a_trouvé_le_chemin(position_des_cases,Espace,nouvel_element)
+                    Chemin_attein=True
+
+            if element not in cote_droit and element+30 not in deja_visite and element+30!=case_de_deoart_valeurcase[0] and element+30 not in case_en_noir_valeurcase:
+                nouvel_element=element+30
+                dessine_un_petit_rectangle_pour_le_chemin(position_des_cases,Espace,nouvel_element)
+                Frontiere.append(nouvel_element)
+                deja_visite.append(nouvel_element)
+
+                dictionaire_des_multiples_chemins[nouvel_element]=element
+
+                if case_darrive_valeurcase[0]==nouvel_element:
+                    on_a_trouvé_le_chemin(position_des_cases,Espace,nouvel_element)
+                    Chemin_attein=True
+        
+            if element not in cote_gauche and element-30 not in deja_visite and element-30!=case_de_deoart_valeurcase[0] and element-30 not in case_en_noir_valeurcase:
+                nouvel_element=element-30
+                dessine_un_petit_rectangle_pour_le_chemin(position_des_cases,Espace,nouvel_element)
+                Frontiere.append(nouvel_element)
+                deja_visite.append(nouvel_element)
+
+                dictionaire_des_multiples_chemins[nouvel_element]=element
+
+                if case_darrive_valeurcase[0]==nouvel_element:
+                    on_a_trouvé_le_chemin(position_des_cases,Espace,nouvel_element)
+                    Chemin_attein=True
+
+        #verifie s'il nya pas de solution ==>Pour faire simple lorsque la frontiere est la meme et ceux pour quelques boucle on en conclue que l'algo "stagne"<==
+        
+        
+        if ancienne_frontiere==Frontiere or v>13257:
+            Lalgo_ne_trouve_rien=True
+            print("lalgo ne trouve rien")
+            font=pygame.font.Font(None,100)
+            texte_de_la_victoire=font.render("Rien trouvé:(",False,Bleu)
+            Surface.blit(texte_de_la_victoire,(position_des_cases[15+4*30][0]-Espace*0.5,position_des_cases[15][1]-Espace*0.5,Espace,Espace))
+            break
+        if k==2:
+            ancienne_frontiere=Frontiere
+            k=0
+        k+=1
+
+        if Chemin_attein==True:
+            break    
+
+        pygame.time.wait(100)
+        pygame.display.update()
+        temps.tick(FPS)
+        
+    dictionaire_des_multiples_chemins[case_de_deoart_valeurcase[0]-1]=case_de_deoart_valeurcase[0]
+    dictionaire_des_multiples_chemins[case_de_deoart_valeurcase[0]+1]=case_de_deoart_valeurcase[0]
+    dictionaire_des_multiples_chemins[case_de_deoart_valeurcase[0]+30]=case_de_deoart_valeurcase[0]
+    dictionaire_des_multiples_chemins[case_de_deoart_valeurcase[0]-30]=case_de_deoart_valeurcase[0]
+    if Chemin_attein==True:
+        dictionaire_des_multiples_chemins=retrace_le_chemin_trouvee_par_lalgo(case_de_deoart_valeurcase,case_darrive_valeurcase,dictionaire_des_multiples_chemins)
+    
+def retrace_le_chemin_trouvee_par_lalgo(case_de_deoart_valeurcase,case_darrive_valeurcase,dictionaire_des_multiples_chemins):
+    position_actuelle=dictionaire_des_multiples_chemins[case_darrive_valeurcase[0]]
+
+    while position_actuelle!=case_de_deoart_valeurcase[0] :
+        on_dessine_le_chemin(position_des_cases,Espace,position_actuelle)
+        
+        pos=position_actuelle
+        position_actuelle=dictionaire_des_multiples_chemins[pos]
+
+    pygame.display.update()
+    temps.tick(FPS)
+    dictionaire_des_multiples_chemins={}
+    font=pygame.font.Font(None,100)
+    texte_de_la_victoire=font.render("Trouvé:)",False,Bleu)
+    Surface.blit(texte_de_la_victoire,(position_des_cases[15+30*8][0]-Espace*0.5,position_des_cases[15][1]-Espace*0.5,Espace,Espace))
+    return dictionaire_des_multiples_chemins
+        
+#valeur de départ pour les boucles 
+souris_click=False
+case_en_noir_valeurcase=[]
+case_en_noir_valeurpixel=[]
+premier_clic=True
+deuxieme_clic=False
+reste_des_clic=False
+reste_des_clic1=False
+case_de_deoart_valeurcase=[]
+case_de_deoart_valeurpixel=[]
+case_darrive_valeurcase=[]
+case_darrive_valeurpixel=[]
+
+while True:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type==MOUSEBUTTONUP:
+            position_souris_x,position_souris_y=event.pos
+            souris_click=True
+            position_xy=(position_souris_x,position_souris_y)
+
+            case=Position_Pixel_en_numero_de_case(position_xy,position_des_cases,Espace)
+            if case!=None:
+                #deuxieme clic
+                if deuxieme_clic==True: 
+                    if case!=case_de_deoart_valeurcase[0]:
+                        dessine_le_point_darrive(position_des_cases,Espace,case)
+                        case_darrive_valeurcase.append(case)
+                        case_darrive_valeurpixel.append(position_xy)
+                        deuxieme_clic=False
+                        reste_des_clic1=True
+                #premier clic
+                if premier_clic==True:
+                    dessine_le_point_de_depart(position_des_cases,Espace,case)
+                    case_de_deoart_valeurcase.append(case)
+                    case_de_deoart_valeurpixel.append(position_xy)
+                    premier_clic=False
+                    deuxieme_clic=True
+                    Frontiere=case_de_deoart_valeurcase
+                #reste des clic
+                if reste_des_clic==True:
+                    if case !=case_darrive_valeurcase[0] and case!=case_de_deoart_valeurcase[0] :
+                        dessine_un_petit_rectangle_noir(position_des_cases,Espace,case)
+                        case_en_noir_valeurcase.append(case)
+                        case_en_noir_valeurpixel.append(position_xy) 
+                #demarre le jeu
+                if case==0 and reste_des_clic==True:
+                    algo_de_recherche_Breadth_first_Search(Frontiere,bordure_du_haut,bordure_du_bas,cote_droit,cote_gauche,position_des_cases,Espace,case_de_deoart_valeurcase,case_en_noir_valeurcase,case_darrive_valeurcase)
+                        
+                #permet de rentrer dans la condition pour le reste des clics
+                if reste_des_clic1==True:
+                    reste_des_clic=True
+                   
+    souris_click=False
+    pygame.display.update()
+    temps.tick(FPS)
+
+ 
+
+
+
+
+                 
+
+                       
+</pre>
+                        </scroll-page>
+
+                        <scroll-page id="page-2">
+                            <nav class="video_">
+                             
+                                
+                                
+                            </nav>
+
+                        </scroll-page>
+                      </scroll-container>
+</nav>
+   
+
+    
+
+
+
+
+    
+
+
+
+    <input type="checkbox" id="menu" name="menu" class="menu-checkbox">
+    <div class="menu">
+      <label class="menu-toggle" for="menu"><span>Toggle</span></label>
+      <ul>
+ 
+
+
+
+        
+
+        
+        <li>
+          <label for="menu-3">CATIA V5</label>
+          <input type="checkbox" id="menu-3" name="menu-3" class="menu-checkbox">
+          <div class="menu">
+            <label class="menu-toggle" for="menu-3"><span>Toggle</span></label>
+            <ul>
+              <li>
+                <a href="catia.html">Aventador</a>
+              </li>
+            
+           
+            </ul>
+          </div>
+        </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <li>
+          <label for="menu-4">Python</label>
+          <input type="checkbox" id="menu-4" name="menu-4" class="menu-checkbox">
+          <div class="menu">
+            <label class="menu-toggle" for="menu-4"><span>Toggle</span></label>
+            <ul>
+              <li>
+                <a href="pathfindin.html">Path finding algorithms </a>
+              </li>
+              <li>
+                <a href="memoire.html">Jeu de mémoire </a>
+              </li>
+              <li>
+                <a href="python_car.html">Car - NEAT</a>
+              </li>
+             
+            </ul>
+          </div>
+        </li>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!--
+        
+        <li>
+          <label for="menu-5">Menu-5</label>
+          <input type="checkbox" id="menu-5" name="menu-5" class="menu-checkbox">
+          <div class="menu">
+            <label class="menu-toggle" for="menu-5"><span>Toggle</span></label>
+            <ul>
+              <li>
+                <a href="#">Menu-5-1</a>
+              </li>
+              <li>
+                <a href="#">Menu-5-2</a>
+              </li>
+              <li>
+                <a href="#">Menu-5-3</a>
+              </li>
+              <li>
+                <a href="#">Menu-5-4</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </ul>
+    </div>
+  </div><!-- #wrapper -->
+
+</body>
+</html>
